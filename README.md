@@ -57,33 +57,35 @@ be/
 
 ## Setup
 
-### 1. Create a virtual environment
+### 1. Install uv
 
-```bash
-python -m venv venv
-```
-
-### 2. Activate the virtual environment
+If you don't have `uv` installed, install it first:
 
 **Windows:**
 
 ```bash
-venv\Scripts\activate
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
 **Linux/Mac:**
 
 ```bash
-source venv/bin/activate
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-### 3. Install dependencies
+### 2. Install dependencies
 
 ```bash
-pip install -r requirements.txt
+uv sync
 ```
 
-### 4. Configure environment variables
+Or if you don't have a `pyproject.toml` yet:
+
+```bash
+uv pip install -r requirements.txt
+```
+
+### 3. Configure environment variables
 
 Copy `.env.example` to `.env` and update the values:
 
@@ -98,22 +100,22 @@ DATABASE_URL=postgresql://user:password@localhost:5432/dbname
 SECRET_KEY=your-secret-key-here
 ```
 
-### 5. Initialize the database
+### 4. Initialize the database
 
 Create your database, then run Alembic migrations:
 
 ```bash
 # Create initial migration
-alembic revision --autogenerate -m "Initial migration"
+uv run alembic revision --autogenerate -m "Initial migration"
 
 # Apply migrations
-alembic upgrade head
+uv run alembic upgrade head
 ```
 
-### 6. Run the application
+### 5. Run the application
 
 ```bash
-uvicorn main:app --reload
+uv run uvicorn main:app --reload
 ```
 
 The API will be available at:
@@ -127,25 +129,25 @@ The API will be available at:
 ### Create a new migration
 
 ```bash
-alembic revision --autogenerate -m "Description of changes"
+uv run alembic revision --autogenerate -m "Description of changes"
 ```
 
 ### Apply migrations
 
 ```bash
-alembic upgrade head
+uv run alembic upgrade head
 ```
 
 ### Rollback migration
 
 ```bash
-alembic downgrade -1
+uv run alembic downgrade -1
 ```
 
 ### View migration history
 
 ```bash
-alembic history
+uv run alembic history
 ```
 
 ## API Endpoints
@@ -168,13 +170,13 @@ alembic history
 Run tests with pytest:
 
 ```bash
-pytest
+uv run pytest
 ```
 
 Run with coverage:
 
 ```bash
-pytest --cov=app tests/
+uv run pytest --cov=app tests/
 ```
 
 ## Adding New Features
@@ -268,8 +270,8 @@ api_router.include_router(items.router, prefix="/items", tags=["items"])
 ### 7. Create and apply migration
 
 ```bash
-alembic revision --autogenerate -m "Add items table"
-alembic upgrade head
+uv run alembic revision --autogenerate -m "Add items table"
+uv run alembic upgrade head
 ```
 
 ## Environment Variables
@@ -292,6 +294,7 @@ alembic upgrade head
 - **Alembic** - Database migration tool
 - **Pydantic** - Data validation using Python type hints
 - **PostgreSQL** - Primary database
+- **uv** - Fast Python package installer and resolver
 - **Uvicorn** - ASGI server
 - **Pytest** - Testing framework
 - **Python-Jose** - JWT implementation
