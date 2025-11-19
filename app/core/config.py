@@ -1,10 +1,14 @@
 from typing import List
 
-from pydantic import AnyHttpUrl
+from pydantic import AnyHttpUrl, field_validator
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
+    # Environment
+    ENVIRONMENT: str = "development"  # development, staging, production
+
+    # Project
     PROJECT_NAME: str = "FastAPI Application"
     VERSION: str = "1.0.0"
     API_V1_PREFIX: str = "/api/v1"
@@ -20,9 +24,18 @@ class Settings(BaseSettings):
     # CORS
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
 
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
+    @field_validator("SECRET_KEY")
+    @classmethod
+    def validate_secret_key(cls, v: str, info) -> str:
+        environment = info.data.get("ENVIRONMENT", "development")
+        if (
+            v == "your-secret-key-here-change-in-production"
+            and environment == "production"
+        ):
+            raise ValueError("SECRET_KEY must be changed in production!")
+        return v
+
+    model_config = {"env_file": ".env", "case_sensitive": True}
 
 
 settings = Settings()

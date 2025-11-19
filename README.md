@@ -1,59 +1,72 @@
-# FastAPI + Alembic REST API Project
+# Didee API - FastAPI REST API
 
-A production-ready REST API application built with FastAPI and Alembic for database migrations.
+A production-ready REST API application built with FastAPI, SQLAlchemy, and Alembic for database migrations.
 
 ## Project Structure
 
 ```
-be/
+didee-api/
 ├── alembic/                    # Database migrations
 │   ├── versions/              # Migration files
 │   ├── env.py                 # Alembic environment configuration
 │   └── script.py.mako         # Migration template
 ├── app/
+│   ├── main.py                # FastAPI application entry point
 │   ├── api/
 │   │   └── v1/
-│   │       ├── endpoints/     # API endpoints
-│   │       │   └── users.py   # User endpoints
-│   │       └── api.py         # API router
+│   │       └── api.py         # API router aggregator
 │   ├── core/
 │   │   ├── config.py          # Application configuration
-│   │   └── security.py        # Security utilities (JWT, password hashing)
-│   ├── crud/
-│   │   └── user.py            # CRUD operations for users
+│   │   ├── security.py        # Security utilities (JWT, password hashing)
+│   │   ├── schemas.py         # Common response schemas
+│   │   ├── exceptions.py      # Exception handlers
+│   │   ├── middleware.py      # Custom middleware
+│   │   ├── logging_config.py  # Logging configuration
+│   │   └── decorators/
+│   │       └── response.py    # Response decorator
 │   ├── db/
 │   │   ├── base.py            # Import all models for Alembic
 │   │   └── session.py         # Database session and Base
-│   ├── models/
-│   │   └── user.py            # SQLAlchemy models
-│   └── schemas/
-│       └── user.py            # Pydantic schemas
+│   ├── modules/
+│   │   ├── auth/              # Authentication module
+│   │   │   ├── router.py      # Auth endpoints
+│   │   │   └── schemas.py     # Auth schemas
+│   │   └── users/             # Users module
+│   │       ├── router.py      # User endpoints
+│   │       ├── schemas.py     # User schemas
+│   │       ├── models.py      # User model
+│   │       └── crud.py        # User CRUD operations
 ├── tests/
 │   ├── conftest.py            # Test fixtures
 │   ├── test_main.py           # Main endpoint tests
+│   ├── test_auth.py           # Auth endpoint tests
 │   └── test_users.py          # User endpoint tests
+├── logs/                       # Application logs (gitignored)
 ├── .env.example               # Example environment variables
 ├── .gitignore                 # Git ignore file
 ├── alembic.ini                # Alembic configuration
-├── main.py                    # FastAPI application entry point
+├── pyproject.toml             # Project metadata and dependencies
 ├── requirements.txt           # Python dependencies
 └── README.md                  # This file
 ```
 
 ## Features
 
-- ✅ FastAPI for high-performance REST API
-- ✅ SQLAlchemy ORM for database operations
-- ✅ Alembic for database migrations
-- ✅ Pydantic for data validation
-- ✅ JWT authentication utilities
-- ✅ Password hashing with bcrypt
-- ✅ CRUD operations example (Users)
-- ✅ Structured project layout
-- ✅ PostgreSQL support
-- ✅ CORS middleware
-- ✅ Environment-based configuration
-- ✅ Pytest for testing
+- ✅ **FastAPI** - High-performance REST API framework
+- ✅ **SQLAlchemy ORM** - Database operations with ORM
+- ✅ **Alembic** - Database migration management
+- ✅ **Pydantic v2** - Data validation and settings management
+- ✅ **JWT Authentication** - Secure token-based authentication
+- ✅ **Password Hashing** - Argon2 password hashing
+- ✅ **Modular Architecture** - Organized by modules (users, auth, etc.)
+- ✅ **PostgreSQL** - Production database support (SQLite for dev)
+- ✅ **CORS Middleware** - Cross-origin resource sharing
+- ✅ **Request Logging** - Automatic request/response logging
+- ✅ **Exception Handling** - Global exception handlers
+- ✅ **Environment-based Config** - Support for dev/staging/prod
+- ✅ **Health Check** - Database connectivity check
+- ✅ **Comprehensive Testing** - Pytest with fixtures
+- ✅ **Type Hints** - Full type annotation support
 
 ## Setup
 
@@ -115,14 +128,15 @@ uv run alembic upgrade head
 ### 5. Run the application
 
 ```bash
-uv run uvicorn main:app --reload
+uv run uvicorn app.main:app --reload
 ```
 
 The API will be available at:
 
-- API: http://localhost:8000
-- Interactive docs: http://localhost:8000/api/v1/docs
-- Alternative docs: http://localhost:8000/api/v1/redoc
+- API Root: http://localhost:8000
+- Interactive docs (Swagger): http://localhost:8000/api/v1/docs
+- Alternative docs (ReDoc): http://localhost:8000/api/v1/redoc
+- Health check: http://localhost:8000/health
 
 ## Database Migrations
 
@@ -152,18 +166,49 @@ uv run alembic history
 
 ## API Endpoints
 
-### Health Check
+### Health & Info
 
-- `GET /` - Root endpoint
-- `GET /health` - Health check
+- `GET /` - API information and links
+- `GET /health` - Health check with database status
 
-### Users (API v1)
+### Authentication (`/api/v1/auth`)
+
+- `POST /api/v1/auth/login` - Login and get access token
+- `POST /api/v1/auth/token` - OAuth2 compatible token endpoint (for Swagger)
+- `GET /api/v1/auth/me` - Get current user profile (requires authentication)
+
+### Users (`/api/v1/users`)
 
 - `GET /api/v1/users/` - List all users
 - `POST /api/v1/users/` - Create a new user
 - `GET /api/v1/users/{user_id}` - Get user by ID
 - `PUT /api/v1/users/{user_id}` - Update user
 - `DELETE /api/v1/users/{user_id}` - Delete user
+
+### Example Usage
+
+1. **Create a user:**
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/users/" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com","username":"testuser","password":"securepass123"}'
+```
+
+2. **Login:**
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{"username":"testuser","password":"securepass123"}'
+```
+
+3. **Access protected endpoint:**
+
+```bash
+curl -X GET "http://localhost:8000/api/v1/auth/me" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
 
 ## Testing
 
@@ -276,16 +321,19 @@ uv run alembic upgrade head
 
 ## Environment Variables
 
-| Variable                    | Description                  | Default             |
-| --------------------------- | ---------------------------- | ------------------- |
-| DATABASE_URL                | PostgreSQL connection string | -                   |
-| PROJECT_NAME                | Application name             | FastAPI Application |
-| VERSION                     | API version                  | 1.0.0               |
-| API_V1_PREFIX               | API v1 prefix                | /api/v1             |
-| SECRET_KEY                  | JWT secret key               | -                   |
-| ALGORITHM                   | JWT algorithm                | HS256               |
-| ACCESS_TOKEN_EXPIRE_MINUTES | Token expiration time        | 30                  |
-| BACKEND_CORS_ORIGINS        | Allowed CORS origins         | []                  |
+| Variable                    | Description                 | Default             | Required |
+| --------------------------- | --------------------------- | ------------------- | -------- |
+| ENVIRONMENT                 | Environment mode            | development         | No       |
+| DATABASE_URL                | Database connection string  | sqlite:///./app.db  | Yes      |
+| PROJECT_NAME                | Application name            | FastAPI Application | No       |
+| VERSION                     | API version                 | 1.0.0               | No       |
+| API_V1_PREFIX               | API v1 prefix               | /api/v1             | No       |
+| SECRET_KEY                  | JWT secret key              | (must change)       | Yes      |
+| ALGORITHM                   | JWT algorithm               | HS256               | No       |
+| ACCESS_TOKEN_EXPIRE_MINUTES | Token expiration (minutes)  | 30                  | No       |
+| BACKEND_CORS_ORIGINS        | Allowed CORS origins (JSON) | []                  | No       |
+
+**Note:** In production, `SECRET_KEY` must be changed from the default value!
 
 ## Technologies
 
