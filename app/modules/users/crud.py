@@ -3,8 +3,8 @@ from typing import List, Optional
 from sqlalchemy.orm import Session
 
 from app.core.security import get_password_hash, verify_password
-from app.models.user import User
-from app.schemas.user import UserCreate, UserUpdate
+from app.models import User
+from app.modules.users.schemas import UserCreate, UserUpdate
 
 
 def get_user(db: Session, user_id: int) -> Optional[User]:
