@@ -55,7 +55,7 @@ async def get_current_active_user(
 
 
 @router.post("/login", response_model=ResponseModel[Token])
-@response_handler(message="Login successful")
+@response_handler(success_message="Login successful", error_message="Login failed")
 def login(login_request: LoginRequest, db: Session = Depends(get_db)):
     """
     OAuth2 compatible token login, get an access token for future requests
@@ -80,7 +80,8 @@ def login(login_request: LoginRequest, db: Session = Depends(get_db)):
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@router.post("/token", response_model=Token, include_in_schema=False)
+@router.post("/token", response_model=ResponseModel[Token], include_in_schema=False)
+@response_handler(success_message="Login successful", error_message="Login failed")
 def login_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):
@@ -106,7 +107,10 @@ def login_access_token(
 
 
 @router.get("/me", response_model=ResponseModel[User])
-@response_handler(message="User profile retrieved successfully")
+@response_handler(
+    success_message="User profile retrieved successfully",
+    error_message="Failed to retrieve user profile",
+)
 def read_users_me(current_user: User = Depends(get_current_active_user)):
     """
     Get current user profile

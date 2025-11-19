@@ -5,15 +5,18 @@ from sqlalchemy.orm import Session
 
 from app.core.decorators.response import response_handler
 from app.core.schemas import ResponseModel
-from app.modules.users import crud as crud_user
 from app.db.session import get_db
+from app.modules.users import crud as crud_user
 from app.modules.users.schemas import User, UserCreate, UserUpdate
 
 router = APIRouter()
 
 
 @router.get("/", response_model=ResponseModel[List[User]])
-@response_handler(message="Users retrieved successfully")
+@response_handler(
+    success_message="Users retrieved successfully",
+    error_message="Failed to retrieve users",
+)
 def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """
     Retrieve users.
@@ -22,8 +25,12 @@ def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return users
 
 
-@router.post("/", response_model=ResponseModel[User], status_code=status.HTTP_201_CREATED)
-@response_handler(message="User created successfully")
+@router.post(
+    "/", response_model=ResponseModel[User], status_code=status.HTTP_201_CREATED
+)
+@response_handler(
+    success_message="User created successfully", error_message="Failed to create user"
+)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     """
     Create new user.
@@ -42,7 +49,10 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/{user_id}", response_model=ResponseModel[User])
-@response_handler(message="User retrieved successfully")
+@response_handler(
+    success_message="User retrieved successfully",
+    error_message="Failed to retrieve user",
+)
 def read_user(user_id: int, db: Session = Depends(get_db)):
     """
     Get user by ID.
@@ -54,7 +64,9 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{user_id}", response_model=ResponseModel[User])
-@response_handler(message="User updated successfully")
+@response_handler(
+    success_message="User updated successfully", error_message="Failed to update user"
+)
 def update_user(user_id: int, user: UserUpdate, db: Session = Depends(get_db)):
     """
     Update a user.
@@ -66,7 +78,9 @@ def update_user(user_id: int, user: UserUpdate, db: Session = Depends(get_db)):
 
 
 @router.delete("/{user_id}", response_model=ResponseModel)
-@response_handler(message="User deleted successfully")
+@response_handler(
+    success_message="User deleted successfully", error_message="Failed to delete user"
+)
 def delete_user(user_id: int, db: Session = Depends(get_db)):
     """
     Delete a user.

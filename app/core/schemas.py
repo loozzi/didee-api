@@ -9,3 +9,4 @@ class ResponseModel(BaseModel, Generic[T]):
     success: bool
     message: str
     data: Optional[T] = None
+    error: Optional[str] = None
