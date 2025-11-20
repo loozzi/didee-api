@@ -35,6 +35,7 @@ class BillingCycle(str, Enum):
     MONTHLY = "monthly"
     YEARLY = "yearly"
 
+
 class SubscriptionStatus(str, Enum):
     """Subscription status options"""
 
@@ -42,3 +43,11 @@ class SubscriptionStatus(str, Enum):
     INACTIVE = "inactive"
     CANCELED = "canceled"
     PENDING = "pending"
+
+
+class UserFoodPreferenceType(str, Enum):
+    """Types of user food preferences"""
+
+    LIKE = "like"
+    DISLIKE = "dislike"
+    ALLERGY = "allergy"
