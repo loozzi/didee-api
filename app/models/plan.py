@@ -1,11 +1,13 @@
 """Plan model definition"""
 
 from uuid import uuid4
-from sqlalchemy import Column, Boolean, Enum, Integer, String
+
+from sqlalchemy import Boolean, Column, Enum, Integer, String
 from sqlalchemy.orm import relationship
 
 from app.models.base import BaseModel
 from app.models.common import BillingCycle, PlanType
+
 
 class Plan(BaseModel):  # pylint: disable=too-few-public-methods
     """Plan database model"""
@@ -21,4 +23,6 @@ class Plan(BaseModel):  # pylint: disable=too-few-public-methods
     billing_cycle = Column(Enum(BillingCycle), nullable=False)
     is_active = Column(Boolean, default=True)
 
+    subscriptions = relationship("Subscription", back_populates="plan")
+    subscriptions = relationship("Subscription", back_populates="plan")
     subscriptions = relationship("Subscription", back_populates="plan")
