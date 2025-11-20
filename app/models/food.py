@@ -20,6 +20,7 @@ class Food(BaseModel):  # pylint: disable=too-few-public-methods
     locations = Column(String, nullable=False, default="[]")  # JSON string of locations
     slug = Column(String, unique=True, index=True, nullable=False)
 
+    preference = relationship("FoodPreference", back_populates="food", uselist=False)
     category_foods = relationship(
         "CategoryFood", back_populates="food", cascade="all, delete-orphan"
     )
