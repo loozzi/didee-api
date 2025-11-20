@@ -3,6 +3,7 @@
 from uuid import uuid4
 
 from sqlalchemy import Column, Enum, String
+from sqlalchemy.orm import relationship
 
 from app.models.base import BaseModel
 from app.models.common import UserProvider
@@ -20,3 +21,5 @@ class User(BaseModel):  # pylint: disable=too-few-public-methods
     email = Column(String, unique=True, index=True, nullable=False)
     phone_number = Column(String, unique=True, index=True, nullable=True)
     provider = Column(Enum(UserProvider), nullable=False, default=UserProvider.EMAIL)
+
+    subscriptions = relationship("Subscription", back_populates="user")

@@ -19,3 +19,26 @@ class AvailableTime(str, Enum):
     EVENING = "evening"
     NIGHT = "night"
     ALLDAY = "all_day"
+
+
+class PlanType(str, Enum):
+    """Types of subscription plans"""
+
+    FREE = "free"
+    CREDIT = "credit"
+    SUBSCRIPTION = "subscription"
+
+
+class BillingCycle(str, Enum):
+    """Billing cycle options for subscription plans"""
+
+    MONTHLY = "monthly"
+    YEARLY = "yearly"
+
+class SubscriptionStatus(str, Enum):
+    """Subscription status options"""
+
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    CANCELED = "canceled"
+    PENDING = "pending"
