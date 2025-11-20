@@ -1,3 +1,5 @@
+"""User model definition"""
+
 from uuid import uuid4
 
 from sqlalchemy import Column, Enum, String
@@ -6,7 +8,9 @@ from app.models.base import BaseModel
 from app.models.common import UserProvider
 
 
-class User(BaseModel):
+class User(BaseModel):  # pylint: disable=too-few-public-methods
+    """User database model"""
+
     __tablename__ = "users"
 
     id = Column(String, primary_key=True, index=True, default=lambda: str(uuid4()))

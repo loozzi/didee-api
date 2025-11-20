@@ -13,7 +13,7 @@ async def log_requests_middleware(request: Request, call_next):
     start_time = time.time()
 
     # Log request
-    logger.info(f"Incoming request: {request.method} {request.url.path}")
+    logger.info("Incoming request: %s %s", request.method, request.url.path)
 
     # Process request
     response = await call_next(request)
@@ -23,9 +23,11 @@ async def log_requests_middleware(request: Request, call_next):
 
     # Log response
     logger.info(
-        f"Completed {request.method} {request.url.path} - "
-        f"Status: {response.status_code} - "
-        f"Duration: {process_time:.3f}s"
+        "Completed %s %s - Status: %s - Duration: %.3fs",
+        request.method,
+        request.url.path,
+        response.status_code,
+        process_time,
     )
 
     # Add custom header

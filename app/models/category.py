@@ -1,3 +1,5 @@
+"""Category model definition"""
+
 from uuid import uuid4
 
 from sqlalchemy import Column, String
@@ -6,7 +8,9 @@ from sqlalchemy.orm import relationship
 from app.models.base import BaseModel
 
 
-class Category(BaseModel):
+class Category(BaseModel):  # pylint: disable=too-few-public-methods
+    """Category database model"""
+
     __tablename__ = "categories"
 
     id = Column(String, primary_key=True, index=True, default=lambda: str(uuid4()))

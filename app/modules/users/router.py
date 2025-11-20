@@ -1,3 +1,5 @@
+"""User routes"""
+
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -88,4 +90,3 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     success = crud_user.delete_user(db, user_id=user_id)
     if not success:
         raise HTTPException(status_code=404, detail="User not found")
-    return None

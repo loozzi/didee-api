@@ -1,3 +1,5 @@
+"""API v1 router configuration"""
+
 from fastapi import APIRouter
 
 from app.modules.auth import router as auth_router

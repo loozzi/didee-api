@@ -1,10 +1,13 @@
+"""Application configuration settings"""
+
 from typing import List
 
 from pydantic import AnyHttpUrl, field_validator
 from pydantic_settings import BaseSettings
 
-
 class Settings(BaseSettings):
+    """Application settings"""
+
     # Environment
     ENVIRONMENT: str = "development"  # development, staging, production
 
@@ -27,6 +30,7 @@ class Settings(BaseSettings):
     @field_validator("SECRET_KEY")
     @classmethod
     def validate_secret_key(cls, v: str, info) -> str:
+        """Validate that SECRET_KEY is changed in production"""
         environment = info.data.get("ENVIRONMENT", "development")
         if (
             v == "your-secret-key-here-change-in-production"

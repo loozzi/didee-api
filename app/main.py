@@ -1,3 +1,5 @@
+"""Main FastAPI application entry point"""
+
 import logging
 
 from fastapi import FastAPI, HTTPException
@@ -6,6 +8,7 @@ from sqlalchemy.exc import IntegrityError
 
 from app.api.v1.api import api_router
 from app.core.config import settings
+from app.db.session import SessionLocal
 from app.core.exceptions import (
     general_exception_handler,
     http_exception_handler,
@@ -28,7 +31,10 @@ app = FastAPI(
 )
 
 logger.info(
-    f"Starting {settings.PROJECT_NAME} v{settings.VERSION} in {settings.ENVIRONMENT} mode"
+    "Starting %s v%s in %s mode",
+    settings.PROJECT_NAME,
+    settings.VERSION,
+    settings.ENVIRONMENT,
 )
 
 # Set up CORS
@@ -68,15 +74,13 @@ async def root():
 @app.get("/health")
 async def health_check():
     """Health check endpoint with database status"""
-    from app.db.session import SessionLocal
-
     db_status = "unknown"
     try:
         db = SessionLocal()
         db.execute("SELECT 1")
         db.close()
         db_status = "healthy"
-    except Exception:
+    except Exception:  # pylint: disable=broad-exception-caught
         db_status = "unhealthy"
 
     return {
