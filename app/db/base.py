@@ -6,9 +6,20 @@ from app.db.session import Base
 from app.models.category import Category
 from app.models.category_food import CategoryFood
 from app.models.food import Food
+from app.models.food_location import FoodLocation
 from app.models.food_preference import FoodPreference
+from app.models.location import Location
 from app.models.user import User
 
 
 # Add other models here as you create them
-__all__ = ["Base", "Category", "CategoryFood", "Food", "FoodPreference", "User"]
+__all__ = [
+    "Base", 
+    "Category", 
+    "CategoryFood", 
+    "Food", 
+    "FoodLocation", 
+    "FoodPreference", 
+    "Location", 
+    "User"
+]

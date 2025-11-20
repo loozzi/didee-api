@@ -17,7 +17,6 @@ class Food(BaseModel):  # pylint: disable=too-few-public-methods
     name = Column(String, nullable=False)
     image = Column(String, nullable=True)
     description = Column(String, nullable=True)
-    locations = Column(String, nullable=False, default="[]")  # JSON string of locations
     slug = Column(String, unique=True, index=True, nullable=False)
 
     preference = relationship("FoodPreference", back_populates="food", uselist=False)
@@ -25,3 +24,7 @@ class Food(BaseModel):  # pylint: disable=too-few-public-methods
         "CategoryFood", back_populates="food", cascade="all, delete-orphan"
     )
     categories = relationship("Category", secondary="category_foods", viewonly=True)
+    food_locations = relationship(
+        "FoodLocation", back_populates="food", cascade="all, delete-orphan"
+    )
+    locations = relationship("Location", secondary="food_locations", viewonly=True)
