@@ -24,5 +24,3 @@ class Plan(BaseModel):  # pylint: disable=too-few-public-methods
     is_active = Column(Boolean, default=True)
 
     subscriptions = relationship("Subscription", back_populates="plan")
-    subscriptions = relationship("Subscription", back_populates="plan")
-    subscriptions = relationship("Subscription", back_populates="plan")
