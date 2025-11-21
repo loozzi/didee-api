@@ -18,7 +18,6 @@ class User(BaseModel):  # pylint: disable=too-few-public-methods
     email = Column(String, unique=True, index=True, nullable=False)
     full_name = Column(String, nullable=True)
     avatar_url = Column(String, nullable=True)
-    email = Column(String, unique=True, index=True, nullable=False)
     phone_number = Column(String, unique=True, index=True, nullable=True)
     provider = Column(Enum(UserProvider), nullable=False, default=UserProvider.EMAIL)
 
