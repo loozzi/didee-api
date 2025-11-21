@@ -1,3 +1,5 @@
+"""Security utilities for authentication and authorization"""
+
 from datetime import datetime, timedelta, timezone
 from typing import Any, Optional, Union
 

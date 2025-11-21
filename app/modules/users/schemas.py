@@ -1,9 +1,13 @@
+"""User schemas"""
+
 from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 class UserBase(BaseModel):
+    """Base user schema with common fields"""
+
     email: EmailStr
     username: str
     full_name: Optional[str] = None
@@ -12,10 +16,14 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
+    """Schema for creating a new user"""
+
     password: str
 
 
 class UserUpdate(BaseModel):
+    """Schema for updating a user"""
+
     email: Optional[EmailStr] = None
     username: Optional[str] = None
     full_name: Optional[str] = None
@@ -25,14 +33,14 @@ class UserUpdate(BaseModel):
 
 
 class UserInDBBase(UserBase):
+    """User schema for database representation"""
+
     id: int
     model_config = ConfigDict(from_attributes=True)
 
 
 class User(UserInDBBase):
     """Schema for User returned to client"""
-
-    pass
 
 
 class UserInDB(UserInDBBase):

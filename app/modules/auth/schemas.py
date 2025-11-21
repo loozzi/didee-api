@@ -1,3 +1,6 @@
+"""Authentication schemas"""
+
+from typing import Optional
 from pydantic import BaseModel
 
 
@@ -11,7 +14,7 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     """Token data schema"""
 
-    username: str | None = None
+    username: Optional[str] = None
 
 
 class LoginRequest(BaseModel):

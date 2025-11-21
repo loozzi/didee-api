@@ -30,6 +30,7 @@ dev = [
     "pytest>=7.4.0",
     "pytest-cov>=4.1.0",
     "httpx>=0.24.0",
+    "pylint>=2.17.5",
 ]
 
 [build-system]
@@ -87,3 +88,8 @@ ignore = [
 
 [tool.ruff.lint.isort]
 known-third-party = ["fastapi", "pydantic", "sqlalchemy", "alembic"]
+
+[tool.uv]
+dev-dependencies = [
+    "pylint",
+]
