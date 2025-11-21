@@ -28,3 +28,6 @@ class Food(BaseModel):  # pylint: disable=too-few-public-methods
         "FoodLocation", back_populates="food", cascade="all, delete-orphan"
     )
     locations = relationship("Location", secondary="food_locations", viewonly=True)
+    recommend_histories = relationship(
+        "RecommendHistory", back_populates="food", cascade="all, delete-orphan"
+    )
