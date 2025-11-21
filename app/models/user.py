@@ -23,3 +23,5 @@ class User(BaseModel):  # pylint: disable=too-few-public-methods
     provider = Column(Enum(UserProvider), nullable=False, default=UserProvider.EMAIL)
 
     subscriptions = relationship("Subscription", back_populates="user")
+    food_preferences = relationship("UserFoodPreference", back_populates="user")
+    recommend_histories = relationship("RecommendHistory", back_populates="user")
