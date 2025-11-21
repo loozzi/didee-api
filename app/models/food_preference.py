@@ -3,7 +3,7 @@
 from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
-from app.models.base import BaseModel  # noqa  # pylint: disable=unused-import
+from app.models.base import BaseModel
 from app.models.common import AvailableTime
 
 
