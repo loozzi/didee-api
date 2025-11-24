@@ -15,7 +15,7 @@ from app.core.exceptions import (
     integrity_error_handler,
 )
 from app.core.logging_config import setup_logging
-from app.core.middleware import log_requests_middleware
+from app.core.middleware import log_requests_middleware, firebase_auth_middleware
 
 # Setup logging
 setup_logging()
@@ -49,6 +49,7 @@ if settings.BACKEND_CORS_ORIGINS:
 
 # Add custom middleware
 app.middleware("http")(log_requests_middleware)
+app.middleware("http")(firebase_auth_middleware)
 
 # Register exception handlers
 app.add_exception_handler(IntegrityError, integrity_error_handler)

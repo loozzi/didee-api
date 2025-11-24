@@ -3,6 +3,8 @@
 from sqlalchemy import Column, DateTime
 from sqlalchemy.sql import func
 
+from app.db.session import Base
+
 
 class TimestampMixin:  # pylint: disable=too-few-public-methods
     """Mixin to add created_at and updated_at timestamps to models"""
@@ -15,7 +17,6 @@ class TimestampMixin:  # pylint: disable=too-few-public-methods
     )
 
 
-from app.db.session import Base  # noqa: E402
 class BaseModel(Base, TimestampMixin):  # pylint: disable=too-few-public-methods
     """Base model class with timestamps"""
 

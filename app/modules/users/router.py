@@ -1,92 +1,96 @@
 """User routes"""
 
-from typing import List
+import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.core.decorators.response import response_handler
-from app.core.schemas import ResponseModel
+from app.core.dependencies import get_current_user
+from app.core.firebase import FirebaseAuth
 from app.db.session import get_db
-from app.modules.users import crud as crud_user
-from app.modules.users.schemas import User, UserCreate, UserUpdate
+from app.models.user import User
+from app.modules.users import crud
+from app.modules.users.schemas import (
+    TokenVerifyRequest,
+    TokenVerifyResponse,
+    UserCreate,
+    UserResponse,
+)
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
 
-@router.get("/", response_model=ResponseModel[List[User]])
-@response_handler(
-    success_message="Users retrieved successfully",
-    error_message="Failed to retrieve users",
-)
-def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+@router.post("/verify", response_model=TokenVerifyResponse, status_code=status.HTTP_200_OK)
+async def verify_firebase_token(
+    request: TokenVerifyRequest,
+    db: Session = Depends(get_db),
+):
     """
-    Retrieve users.
+    Verify Firebase token and create user if not exists
+
+    This endpoint:
+    - Verifies the Firebase authentication token
+    - Creates a new user in the database if the user doesn't exist
+    - Returns the user information
     """
-    users = crud_user.get_users(db, skip=skip, limit=limit)
-    return users
+    try:
+        # Verify Firebase token
+        decoded_token = await FirebaseAuth.verify_token(request.firebase_token)
+
+        # Extract user information from token
+        user_info = FirebaseAuth.get_user_from_token(decoded_token)
+        firebase_uid = user_info["firebase_uid"]
+
+        # Check if user already exists
+        existing_user = crud.get_user_by_firebase_uid(db, firebase_uid)
+
+        if existing_user:
+            # User exists, return existing user
+            return TokenVerifyResponse(
+                message="User verified successfully",
+                user=UserResponse.model_validate(existing_user),
+                is_new_user=False,
+            )
+
+        # User doesn't exist, create new user
+        user_create = UserCreate(
+            firebase_uid=user_info["firebase_uid"],
+            email=user_info["email"],
+            full_name=user_info.get("full_name"),
+            avatar_url=user_info.get("avatar_url"),
+            phone_number=user_info.get("phone_number"),
+            provider=user_info.get("provider", "EMAIL"),
+        )
+
+        new_user = crud.create_user(db, user_create)
+        logger.info("Created new user with Firebase UID: %s", firebase_uid)
+
+        return TokenVerifyResponse(
+            message="User created successfully",
+            user=UserResponse.model_validate(new_user),
+            is_new_user=True,
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        logger.error("Error verifying token and creating user: %s", str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to verify token and process user",
+        ) from e
 
 
-@router.post(
-    "/", response_model=ResponseModel[User], status_code=status.HTTP_201_CREATED
-)
-@response_handler(
-    success_message="User created successfully", error_message="Failed to create user"
-)
-def create_user(user: UserCreate, db: Session = Depends(get_db)):
+@router.get("/me", response_model=UserResponse, status_code=status.HTTP_200_OK)
+async def get_current_user_info(
+    current_user: User = Depends(get_current_user),
+):
     """
-    Create new user.
+    Get current authenticated user information
+
+    This endpoint requires a valid Firebase authentication token
+    Returns the user information from the database
     """
-    # Check if user with email already exists
-    db_user = crud_user.get_user_by_email(db, email=user.email)
-    if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-
-    # Check if user with username already exists
-    db_user = crud_user.get_user_by_username(db, username=user.username)
-    if db_user:
-        raise HTTPException(status_code=400, detail="Username already registered")
-
-    return crud_user.create_user(db=db, user=user)
-
-
-@router.get("/{user_id}", response_model=ResponseModel[User])
-@response_handler(
-    success_message="User retrieved successfully",
-    error_message="Failed to retrieve user",
-)
-def read_user(user_id: int, db: Session = Depends(get_db)):
-    """
-    Get user by ID.
-    """
-    db_user = crud_user.get_user(db, user_id=user_id)
-    if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return db_user
-
-
-@router.put("/{user_id}", response_model=ResponseModel[User])
-@response_handler(
-    success_message="User updated successfully", error_message="Failed to update user"
-)
-def update_user(user_id: int, user: UserUpdate, db: Session = Depends(get_db)):
-    """
-    Update a user.
-    """
-    db_user = crud_user.update_user(db, user_id=user_id, user_update=user)
-    if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return db_user
-
-
-@router.delete("/{user_id}", response_model=ResponseModel)
-@response_handler(
-    success_message="User deleted successfully", error_message="Failed to delete user"
-)
-def delete_user(user_id: int, db: Session = Depends(get_db)):
-    """
-    Delete a user.
-    """
-    success = crud_user.delete_user(db, user_id=user_id)
-    if not success:
-        raise HTTPException(status_code=404, detail="User not found")
+    return UserResponse.model_validate(current_user)

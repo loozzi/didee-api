@@ -14,7 +14,7 @@ from app.core.security import create_access_token
 from app.db.session import get_db
 from app.modules.auth.schemas import LoginRequest, Token, TokenData
 from app.modules.users import crud as crud_user
-from app.modules.users.schemas import User
+from app.models.user import User
 
 router = APIRouter()
 
