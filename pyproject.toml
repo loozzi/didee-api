@@ -89,7 +89,7 @@ ignore = [
 [tool.ruff.lint.isort]
 known-third-party = ["fastapi", "pydantic", "sqlalchemy", "alembic"]
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "pylint",
 ]
