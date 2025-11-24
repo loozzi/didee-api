@@ -15,6 +15,7 @@ class User(BaseModel):  # pylint: disable=too-few-public-methods
     __tablename__ = "users"
 
     id = Column(String, primary_key=True, index=True, default=lambda: str(uuid4()))
+    firebase_uid = Column(String, unique=True, index=True, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
     full_name = Column(String, nullable=True)
     avatar_url = Column(String, nullable=True)
