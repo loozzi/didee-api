@@ -2,7 +2,7 @@
 
 from uuid import uuid4
 
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, ForeignKey, String, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -15,8 +15,8 @@ class RecommendHistory(BaseModel):  # pylint: disable=too-few-public-methods
     __tablename__ = "recommend_histories"
 
     id = Column(String, primary_key=True, index=True, default=lambda: str(uuid4()))
-    user_id = Column(Integer, nullable=False, index=True)
-    food_id = Column(Integer, nullable=False, index=True)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    food_id = Column(String, ForeignKey("foods.id"), nullable=False, index=True)
     timestamp = Column(DateTime, nullable=False, server_default=func.now())  # pylint: disable=not-callable
 
     # Relationship to User model (assuming a User model exists)

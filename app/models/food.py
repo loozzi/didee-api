@@ -31,3 +31,6 @@ class Food(BaseModel):  # pylint: disable=too-few-public-methods
     recommend_histories = relationship(
         "RecommendHistory", back_populates="food", cascade="all, delete-orphan"
     )
+    user_preferences = relationship(
+        "UserFoodPreference", back_populates="food", cascade="all, delete-orphan"
+    )

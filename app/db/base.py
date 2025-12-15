@@ -2,6 +2,9 @@
 
 # pylint: disable=cyclic-import
 
+# Import Base for Alembic
+from app.db.session import Base
+
 # Import all models here for Alembic to detect them
 from app.models.category import Category
 from app.models.category_food import CategoryFood
@@ -17,6 +20,7 @@ from app.models.user_food_preference import UserFoodPreference
 
 # Add other models here as you create them
 __all__ = [
+    "Base",
     "Category",
     "CategoryFood",
     "Food",
