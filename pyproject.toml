@@ -90,6 +90,9 @@ ignore = [
 [tool.ruff.lint.isort]
 known-third-party = ["fastapi", "pydantic", "sqlalchemy", "alembic"]
 
+[tool.pylint.messages_control]
+disable = ["duplicate-code"]
+
 [dependency-groups]
 dev = [
     "pylint",
