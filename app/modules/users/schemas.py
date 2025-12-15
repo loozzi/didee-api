@@ -1,5 +1,6 @@
 """User schemas"""
 
+from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel, EmailStr
@@ -35,8 +36,8 @@ class UserResponse(UserBase):
     id: str
     firebase_uid: str
     provider: str
-    created_at: str
-    updated_at: str
+    created_at: datetime
+    updated_at: datetime
 
     class Config:  # pylint: disable=too-few-public-methods
         """Pydantic config"""

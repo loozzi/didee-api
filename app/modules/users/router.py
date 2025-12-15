@@ -35,52 +35,52 @@ async def verify_firebase_token(
     - Creates a new user in the database if the user doesn't exist
     - Returns the user information
     """
-    # try:
-    # Verify Firebase token
-    decoded_token = await FirebaseAuth.verify_token(request.firebase_token)
+    try:
+        # Verify Firebase token
+        decoded_token = await FirebaseAuth.verify_token(request.firebase_token)
 
-    # Extract user information from token
-    user_info = FirebaseAuth.get_user_from_token(decoded_token)
-    firebase_uid = user_info["firebase_uid"]
+        # Extract user information from token
+        user_info = FirebaseAuth.get_user_from_token(decoded_token)
+        firebase_uid = user_info["firebase_uid"]
 
-    # Check if user already exists
-    existing_user = crud.get_user_by_firebase_uid(db, firebase_uid)
+        # Check if user already exists
+        existing_user = crud.get_user_by_firebase_uid(db, firebase_uid)
 
-    if existing_user:
-        # User exists, return existing user
-        return TokenVerifyResponse(
-            message="User verified successfully",
-            user=UserResponse.model_validate(existing_user),
-            is_new_user=False,
+        if existing_user:
+            # User exists, return existing user
+            return TokenVerifyResponse(
+                message="User verified successfully",
+                user=UserResponse.model_validate(existing_user),
+                is_new_user=False,
+            )
+
+        # User doesn't exist, create new user
+        user_create = UserCreate(
+            firebase_uid=user_info["firebase_uid"],
+            email=user_info["email"],
+            full_name=user_info.get("full_name"),
+            avatar_url=user_info.get("avatar_url"),
+            phone_number=user_info.get("phone_number"),
+            provider=user_info.get("provider", "EMAIL"),
         )
 
-    # User doesn't exist, create new user
-    user_create = UserCreate(
-        firebase_uid=user_info["firebase_uid"],
-        email=user_info["email"],
-        full_name=user_info.get("full_name"),
-        avatar_url=user_info.get("avatar_url"),
-        phone_number=user_info.get("phone_number"),
-        provider=user_info.get("provider", "EMAIL"),
-    )
+        new_user = crud.create_user(db, user_create)
+        logger.info("Created new user with Firebase UID: %s", firebase_uid)
 
-    new_user = crud.create_user(db, user_create)
-    logger.info("Created new user with Firebase UID: %s", firebase_uid)
+        return TokenVerifyResponse(
+            message="User created successfully",
+            user=UserResponse.model_validate(new_user),
+            is_new_user=True,
+        )
 
-    return TokenVerifyResponse(
-        message="User created successfully",
-        user=UserResponse.model_validate(new_user),
-        is_new_user=True,
-    )
-
-    # except HTTPException:
-    #     raise
-    # except Exception as e:  # pylint: disable=broad-exception-caught
-    #     logger.error("Error verifying token and creating user: %s", str(e))
-    #     raise HTTPException(
-    #         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-    #         detail="Failed to verify token and process user",
-    #     ) from e
+    except HTTPException:
+        raise
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        logger.error("Error verifying token and creating user: %s", str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to verify token and process user",
+        ) from e
 
 
 @router.get("/me", response_model=UserResponse, status_code=status.HTTP_200_OK)
