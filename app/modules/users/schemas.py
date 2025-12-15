@@ -1,49 +1,59 @@
 """User schemas"""
 
+from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, EmailStr
 
 
 class UserBase(BaseModel):
-    """Base user schema with common fields"""
+    """Base user schema"""
 
     email: EmailStr
-    username: str
     full_name: Optional[str] = None
-    is_active: Optional[bool] = True
-    is_superuser: Optional[bool] = False
+    avatar_url: Optional[str] = None
+    phone_number: Optional[str] = None
 
 
 class UserCreate(UserBase):
-    """Schema for creating a new user"""
+    """User creation schema"""
 
-    password: str
+    firebase_uid: str
+    provider: str
 
 
 class UserUpdate(BaseModel):
-    """Schema for updating a user"""
+    """User update schema"""
 
-    email: Optional[EmailStr] = None
-    username: Optional[str] = None
     full_name: Optional[str] = None
-    password: Optional[str] = None
-    is_active: Optional[bool] = None
-    is_superuser: Optional[bool] = None
+    avatar_url: Optional[str] = None
+    phone_number: Optional[str] = None
 
 
-class UserInDBBase(UserBase):
-    """User schema for database representation"""
+class UserResponse(UserBase):
+    """User response schema"""
 
-    id: int
-    model_config = ConfigDict(from_attributes=True)
+    id: str
+    firebase_uid: str
+    provider: str
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:  # pylint: disable=too-few-public-methods
+        """Pydantic config"""
+
+        from_attributes = True
 
 
-class User(UserInDBBase):
-    """Schema for User returned to client"""
+class TokenVerifyRequest(BaseModel):
+    """Firebase token verification request"""
+
+    firebase_token: str
 
 
-class UserInDB(UserInDBBase):
-    """Schema for User in database (includes hashed_password)"""
+class TokenVerifyResponse(BaseModel):
+    """Firebase token verification response"""
 
-    hashed_password: str
+    message: str
+    user: Optional[UserResponse] = None
+    is_new_user: bool = False

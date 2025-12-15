@@ -1,4 +1,3 @@
-# pylint: disable=cyclic-import
 """CategoryFood association table model"""
 
 from sqlalchemy import Column, ForeignKey, PrimaryKeyConstraint, String

@@ -24,8 +24,21 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
+    # Firebase
+    FIREBASE_CREDENTIALS_PATH: str = ""  # Path to Firebase service account JSON file
+
     # CORS
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
+
+    # Routes that don't require authentication
+    PUBLIC_ROUTES: List[str] = [
+        "/",
+        "/health",
+        "/api/v1/docs",
+        "/api/v1/redoc",
+        "/api/v1/openapi.json",
+        "/api/v1/users/verify",
+    ]
 
     @field_validator("SECRET_KEY")
     @classmethod

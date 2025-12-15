@@ -3,7 +3,7 @@
 from sqlalchemy import Column, DateTime
 from sqlalchemy.sql import func
 
-from app.db.base import Base  # noqa: F401
+from app.db.session import Base
 
 
 class TimestampMixin:  # pylint: disable=too-few-public-methods

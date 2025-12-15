@@ -9,6 +9,7 @@ class UserProvider(str, Enum):
     EMAIL = "email"
     GOOGLE = "google"
     FACEBOOK = "facebook"
+    APPLE = "apple"
 
 
 class AvailableTime(str, Enum):
